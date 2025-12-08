@@ -28,6 +28,7 @@ const logEnv = () => {
     console.log('- PORT:', PORT);
     console.log('- NODE_ENV:', process.env.NODE_ENV || 'undefined');
     console.log('- VERCEL:', process.env.VERCEL || 'undefined');
+    console.log('- FRONTEND_URL:', process.env.FRONTEND_URL || '[NOT SET]');
     console.log('- MONGODB_URI:', mask(process.env.MONGODB_URI));
     console.log('- IMGBB_API_KEY:', process.env.IMGBB_API_KEY ? '[SET]' : '[NOT SET]');
     console.log('---------------------------------');
@@ -78,6 +79,9 @@ app.use(cors(corsOptions));
 // Additional CORS headers for Vercel
 app.use((req, res, next) => {
   const origin = req.headers.origin;
+  console.log(`📨 Incoming request: ${req.method} ${req.path} from origin: ${origin || 'no-origin'}`);
+  console.log(`🔧 FRONTEND_URL env var: ${process.env.FRONTEND_URL || '[NOT SET]'}`);
+  
   // Allow localhost on any port in development
   if (origin && (origin.includes('localhost') || origin.includes('127.0.0.1'))) {
     res.header('Access-Control-Allow-Origin', origin);
@@ -90,6 +94,7 @@ app.use((req, res, next) => {
   
   // Handle preflight
   if (req.method === 'OPTIONS') {
+    console.log(`✅ Handling OPTIONS preflight request from ${origin}`);
     return res.status(200).end();
   }
   next();
