@@ -454,7 +454,55 @@ app.get('/', (req, res) => {
     running: true,
     service: 'Techsortium Backend API',
     timestamp: new Date().toISOString(),
+    environment: {
+      nodeEnv: process.env.NODE_ENV || 'undefined',
+      isVercel: process.env.VERCEL === '1',
+      hasFrontendUrl: !!process.env.FRONTEND_URL,
+      hasMongoUri: !!process.env.MONGODB_URI,
+      hasImgbbKey: !!process.env.IMGBB_API_KEY,
+    }
   });
+});
+
+// Diagnostic endpoint
+app.get('/api/health', async (req, res) => {
+  const health = {
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    environment: {
+      nodeEnv: process.env.NODE_ENV || 'undefined',
+      isVercel: process.env.VERCEL === '1',
+      hasFrontendUrl: !!process.env.FRONTEND_URL,
+      frontendUrl: process.env.FRONTEND_URL || '[NOT SET]',
+      hasMongoUri: !!process.env.MONGODB_URI,
+      hasImgbbKey: !!process.env.IMGBB_API_KEY,
+    },
+    database: {
+      connected: false,
+      collections: {
+        events: false,
+        registrations: false,
+      }
+    }
+  };
+
+  try {
+    await connectDB();
+    health.database.connected = true;
+    health.database.collections.events = !!eventsCollection;
+    health.database.collections.registrations = !!registrationsCollection;
+    
+    // Test a simple query
+    if (eventsCollection) {
+      const count = await eventsCollection.countDocuments();
+      health.database.eventsCount = count;
+    }
+  } catch (error) {
+    health.status = 'error';
+    health.database.error = error.message;
+  }
+
+  return res.json(health);
 });
 
 // Get all events
