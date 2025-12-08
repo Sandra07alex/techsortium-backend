@@ -218,15 +218,20 @@ const connectDB = async () => {
     }
 
     // MongoDB connection options for SSL/TLS
-    // Note: mongodb+srv:// automatically uses TLS, so we don't need to set tls: true explicitly
+    // Vercel-specific configuration to handle TLS issues
     const mongoOptions = {
-      serverSelectionTimeoutMS: 10000, // Increased timeout
-      socketTimeoutMS: 45000,
-      connectTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 30000, // Increased timeout for serverless
+      socketTimeoutMS: 75000,
+      connectTimeoutMS: 30000,
       retryWrites: true,
       w: 'majority',
-      // For mongodb+srv://, TLS is automatic, but we can add these for standard connections
-      // tls: true, // Uncomment if using standard mongodb:// connection string
+      // Force TLS 1.2+ and disable certificate validation issues
+      tls: true,
+      tlsAllowInvalidCertificates: false,
+      tlsAllowInvalidHostnames: false,
+      // Add these for better compatibility with Vercel/serverless
+      maxPoolSize: 10,
+      minPoolSize: 1,
     };
 
     console.log('🔌 Attempting to connect to MongoDB...');
