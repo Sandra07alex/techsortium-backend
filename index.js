@@ -55,7 +55,12 @@ const corsOptions = {
     ];
     // Allow requests with no origin (like mobile apps or curl requests)
     // In development, allow all localhost origins
-    if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin.includes('localhost') || origin.includes('127.0.0.1')) {
+    // In production, allow Vercel domains
+    if (!origin || 
+        allowedOrigins.indexOf(origin) !== -1 || 
+        origin.includes('localhost') || 
+        origin.includes('127.0.0.1') ||
+        origin.includes('vercel.app')) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
