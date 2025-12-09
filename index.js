@@ -6,6 +6,7 @@ import multer from 'multer';
 import { MongoClient } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
+import compression from 'compression';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -76,11 +77,37 @@ const corsOptions = {
 // Middleware
 app.use(cors(corsOptions));
 
+// GZIP Compression - major performance boost
+app.use(compression({
+  threshold: 0, // Compress all responses
+  level: 6, // Compression level (0-9)
+  filter: (req, res) => {
+    // Don't compress file uploads
+    if (req.headers['content-type']?.includes('multipart/form-data')) {
+      return false;
+    }
+    return compression.filter(req, res);
+  }
+}));
+
+// Cache middleware for GET requests (5 minutes for events, 1 minute for registrations)
+app.use((req, res, next) => {
+  // Cache GET requests only
+  if (req.method === 'GET') {
+    const cacheTime = req.path.includes('/registrations') ? 60 : 300; // 5 min for events, 1 min for registrations
+    res.set('Cache-Control', `public, max-age=${cacheTime}`);
+  } else {
+    res.set('Cache-Control', 'no-cache');
+  }
+  next();
+});
+
 // Additional CORS headers for Vercel
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  console.log(`📨 Incoming request: ${req.method} ${req.path} from origin: ${origin || 'no-origin'}`);
-  console.log(`🔧 FRONTEND_URL env var: ${process.env.FRONTEND_URL || '[NOT SET]'}`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`📨 Incoming request: ${req.method} ${req.path} from origin: ${origin || 'no-origin'}`);
+  }
   
   // Allow localhost on any port in development
   if (origin && (origin.includes('localhost') || origin.includes('127.0.0.1'))) {
@@ -94,7 +121,6 @@ app.use((req, res, next) => {
   
   // Handle preflight
   if (req.method === 'OPTIONS') {
-    console.log(`✅ Handling OPTIONS preflight request from ${origin}`);
     return res.status(200).end();
   }
   next();
@@ -103,52 +129,17 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Middleware to log outgoing JSON responses (masks sensitive fields)
-const SENSITIVE_KEYS = new Set(['paymentScreenshotDeleteUrl', 'paymentScreenshotUrl', 'MONGODB_URI', 'IMGBB_API_KEY']);
-const maskValue = (v) => {
-  if (v == null) return v;
-  const s = String(v);
-  if (s.length <= 8) return '***';
-  return `${s.slice(0,4)}...${s.slice(-4)} (len:${s.length})`;
-};
-
-const maskResponseObject = (obj) => {
-  try {
-    const seen = new WeakSet();
-    const clone = (value) => {
-      if (value && typeof value === 'object') {
-        if (seen.has(value)) return '[Circular]';
-        seen.add(value);
-        if (Array.isArray(value)) return value.map(clone);
-        const out = {};
-        for (const k of Object.keys(value)) {
-          if (SENSITIVE_KEYS.has(k)) out[k] = '[MASKED]';
-          else out[k] = clone(value[k]);
-        }
-        return out;
-      }
-      return value;
-    };
-    return clone(obj);
-  } catch (e) {
-    return '[UNABLE_TO_MASK]';
-  }
-};
-
-app.use((req, res, next) => {
-  const oldJson = res.json.bind(res);
-  res.json = (body) => {
-    try {
-      const masked = maskResponseObject(body);
+// Only log responses in development mode
+if (process.env.NODE_ENV !== 'production') {
+  app.use((req, res, next) => {
+    const oldJson = res.json.bind(res);
+    res.json = (body) => {
       console.log(`<< Response -- ${req.method} ${req.originalUrl} ${res.statusCode || 200}`);
-      console.log(JSON.stringify(masked, null, 2));
-    } catch (err) {
-      console.error('Failed to log response:', err && err.message);
-    }
-    return oldJson(body);
-  };
-  next();
-});
+      return oldJson(body);
+    };
+    next();
+  });
+}
 
 // Rate limiting middleware - INCREASED SESSION EXPIRING TIME
 const registrationLimiter = rateLimit({
