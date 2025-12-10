@@ -232,7 +232,7 @@ const connectDB = async () => {
       tlsAllowInvalidCertificates: false,
       tlsAllowInvalidHostnames: false,
       // Add these for better compatibility with Vercel/serverless
-      maxPoolSize: 10,
+      maxPoolSize: 50, // allow moderate bursts
       minPoolSize: 1,
     };
 
@@ -581,7 +581,9 @@ app.get('/api/events/:slug', async (req, res) => {
 // Register for an event
 app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'), validateRegistration, async (req, res) => {
   const registrationStartTime = Date.now();
-  
+  let normalizedSlug = '';
+  let capacityReserved = false;
+
   try {
     await connectDB();
     if (!registrationsCollection || !eventsCollection) {
@@ -606,7 +608,7 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
       paymentDone,
     } = req.body;
 
-    const normalizedSlug = normalizeSlug(eventSlug);
+    normalizedSlug = normalizeSlug(eventSlug);
     const normalizedEmail = String(email || '').trim().toLowerCase();
 
     console.log(`📝 New registration attempt: ${email} for event ${normalizedSlug}`);
@@ -624,14 +626,29 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
       });
     }
 
-    // Check capacity if event has capacity limit
+    // Atomically reserve a slot when capacity is defined to prevent overbooking
     if (event.capacity !== null) {
-      const registeredCount = await registrationsCollection.countDocuments({
-        eventSlug: normalizedSlug,
-        status: { $ne: 'cancelled' }
-      });
-      
-      if (registeredCount >= event.capacity) {
+      const reservation = await eventsCollection.findOneAndUpdate(
+        {
+          slug: normalizedSlug,
+          $expr: {
+            $or: [
+              { $eq: ['$capacity', null] },
+              { $gt: ['$capacity', { $ifNull: ['$registeredCount', 0] }] }
+            ]
+          }
+        },
+        [
+          {
+            $set: {
+              registeredCount: { $add: [{ $ifNull: ['$registeredCount', 0] }, 1] }
+            }
+          }
+        ],
+        { returnDocument: 'after' }
+      );
+
+      if (!reservation.value) {
         return res.status(409).json({
           success: false,
           message: 'Event is full',
@@ -639,6 +656,8 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
           errorCode: 'EVENT_FULL'
         });
       }
+
+      capacityReserved = true;
     }
 
     // Check if email already registered for this event - DISABLED to allow duplicate registrations
@@ -755,6 +774,15 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
 
   } catch (error) {
     console.error('❌ Registration error:', error.message);
+
+    // Roll back capacity reservation on failure
+    if (capacityReserved) {
+      try {
+        await eventsCollection.updateOne({ slug: normalizedSlug }, { $inc: { registeredCount: -1 } });
+      } catch (rollbackErr) {
+        console.error('⚠️  Failed to roll back capacity reservation:', rollbackErr.message);
+      }
+    }
     
     // Handle duplicate key errors
     if (error.code === 11000) {

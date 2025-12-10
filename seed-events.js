@@ -222,22 +222,8 @@ const events = [
     fee: null,
     qrPaymentRequired: false
   },
-  {
-    id: "h1",
-    title: "TechHack 2024",
-    slug: "techhack-2024",
-    track: "hackathon",
-    shortDescription: "24-hour hackathon to build innovative solutions for real problems.",
-    longDescription: "Join the flagship 24-hour hackathon of IEEE Techsortium! Form teams of up to 4 members and build innovative solutions for real-world challenges. Themes include sustainability, healthcare, education, and fintech. Mentorship available throughout the event.",
-    posterUrl: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&auto=format&fit=crop",
-    datetime: "2024-03-27T08:00:00",
-    capacity: 200,
-    fee: 50,
-    qrPaymentRequired: true,
-    prizes: ["1st: ₹50,000", "2nd: ₹30,000", "3rd: ₹20,000", "Special Categories: ₹10,000 each"],
-    requirements: ["Team of 2-4 members", "Laptop mandatory", "Valid ID proof"]
-  }
 ];
+// TechHack 2024 (hackathon track) has been cancelled
 
 async function seedEvents() {
   const client = new MongoClient(process.env.MONGODB_URI);
