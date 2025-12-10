@@ -221,9 +221,9 @@ const events = [
     capacity: 70,
     fee: null,
     qrPaymentRequired: false
-  },
+  }
+  // TechHack 2024 (hackathon track) has been cancelled
 ];
-// TechHack 2024 (hackathon track) has been cancelled
 
 async function seedEvents() {
   const client = new MongoClient(process.env.MONGODB_URI);
