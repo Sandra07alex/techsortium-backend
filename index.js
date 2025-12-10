@@ -626,16 +626,13 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
       });
     }
 
-    // Atomically reserve a slot when capacity is defined to prevent overbooking
-    if (event.capacity !== null) {
+    // Atomically reserve a slot - only check capacity if capacity is defined and > 0
+    if (event.capacity !== null && event.capacity > 0) {
       const reservation = await eventsCollection.findOneAndUpdate(
         {
           slug: normalizedSlug,
           $expr: {
-            $or: [
-              { $eq: ['$capacity', null] },
-              { $gt: ['$capacity', { $ifNull: ['$registeredCount', 0] }] }
-            ]
+            $gt: ['$capacity', { $ifNull: ['$registeredCount', 0] }]
           }
         },
         [
@@ -658,6 +655,20 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
       }
 
       capacityReserved = true;
+    } else {
+      // If capacity is null or 0, just increment the count without checking
+      await eventsCollection.findOneAndUpdate(
+        { slug: normalizedSlug },
+        [
+          {
+            $set: {
+              registeredCount: { $add: [{ $ifNull: ['$registeredCount', 0] }, 1] }
+            }
+          }
+        ],
+        { returnDocument: 'after' }
+      );
+      capacityReserved = false;
     }
 
     // Check if email already registered for this event - DISABLED to allow duplicate registrations
