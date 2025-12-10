@@ -11,6 +11,17 @@ import compression from 'compression';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Normalize event slugs and handle known aliases
+const normalizeSlug = (slug) => {
+  const safe = (slug || '').toString().trim().toLowerCase();
+  const aliases = {
+    'web-dev-competition': 'web-development-competition',
+    'webdev-competition': 'web-development-competition',
+    'web-development-comp': 'web-development-competition',
+  };
+  return aliases[safe] || safe;
+};
+
 // Log selected environment variables safely (masks secrets)
 const mask = (val) => {
   if (!val) return '[NOT SET]';
@@ -544,13 +555,14 @@ app.get('/api/events/:slug', async (req, res) => {
       });
     }
 
-    const { slug } = req.params;
-    const event = await eventsCollection.findOne({ slug });
+    const normalizedSlug = normalizeSlug(req.params.slug);
+    const event = await eventsCollection.findOne({ slug: normalizedSlug });
 
     if (!event) {
       return res.status(404).json({
         success: false,
-        message: 'Event not found'
+        message: 'Event not found',
+        attemptedSlug: normalizedSlug
       });
     }
 
@@ -594,7 +606,7 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
       paymentDone,
     } = req.body;
 
-    const normalizedSlug = String(eventSlug || '').trim().toLowerCase();
+    const normalizedSlug = normalizeSlug(eventSlug);
     const normalizedEmail = String(email || '').trim().toLowerCase();
 
     console.log(`📝 New registration attempt: ${email} for event ${normalizedSlug}`);
@@ -785,12 +797,12 @@ app.get('/api/registrations/:slug', async (req, res) => {
       });
     }
 
-    const { slug } = req.params;
-    
+    const normalizedSlug = normalizeSlug(req.params.slug);
+
     // Optional: Add authentication/authorization here for admin access
-    
+
     const registrations = await registrationsCollection.find({
-      eventSlug: slug
+      eventSlug: normalizedSlug
     }).toArray();
 
     // Remove sensitive data
