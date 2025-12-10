@@ -125,6 +125,9 @@ app.use((req, res, next) => {
   // Allow localhost on any port in development
   if (origin && (origin.includes('localhost') || origin.includes('127.0.0.1'))) {
     res.header('Access-Control-Allow-Origin', origin);
+  } else if (origin && origin.includes('vercel.app')) {
+    // Allow all vercel.app domains (including preview deployments)
+    res.header('Access-Control-Allow-Origin', origin);
   } else {
     res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URL || '*');
   }
