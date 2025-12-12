@@ -61,10 +61,12 @@ const corsOptions = {
       process.env.FRONTEND_URL || 'http://localhost:5173',
       'http://localhost:3000',
       'http://localhost:5173',
+      'http://localhost:5174',
       'http://localhost:8080', // Add port 8080 support
       'http://127.0.0.1:8080',
       'http://127.0.0.1:5173',
       'http://127.0.0.1:3000',
+      'https://techsortium-dashboard.vercel.app',
     ];
     // Allow requests with no origin (like mobile apps or curl requests)
     // In development, allow all localhost origins
@@ -122,6 +124,9 @@ app.use((req, res, next) => {
   
   // Allow localhost on any port in development
   if (origin && (origin.includes('localhost') || origin.includes('127.0.0.1'))) {
+    res.header('Access-Control-Allow-Origin', origin);
+  } else if (origin && origin.includes('vercel.app')) {
+    // Allow all vercel.app domains (including preview deployments)
     res.header('Access-Control-Allow-Origin', origin);
   } else {
     res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URL || '*');
@@ -232,7 +237,7 @@ const connectDB = async () => {
       tlsAllowInvalidCertificates: false,
       tlsAllowInvalidHostnames: false,
       // Add these for better compatibility with Vercel/serverless
-      maxPoolSize: 10,
+      maxPoolSize: 50, // allow moderate bursts
       minPoolSize: 1,
     };
 
@@ -581,7 +586,9 @@ app.get('/api/events/:slug', async (req, res) => {
 // Register for an event
 app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'), validateRegistration, async (req, res) => {
   const registrationStartTime = Date.now();
-  
+  let normalizedSlug = '';
+  let capacityReserved = false;
+
   try {
     await connectDB();
     if (!registrationsCollection || !eventsCollection) {
@@ -606,7 +613,7 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
       paymentDone,
     } = req.body;
 
-    const normalizedSlug = normalizeSlug(eventSlug);
+    normalizedSlug = normalizeSlug(eventSlug);
     const normalizedEmail = String(email || '').trim().toLowerCase();
 
     console.log(`📝 New registration attempt: ${email} for event ${normalizedSlug}`);
@@ -624,14 +631,26 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
       });
     }
 
-    // Check capacity if event has capacity limit
-    if (event.capacity !== null) {
-      const registeredCount = await registrationsCollection.countDocuments({
-        eventSlug: normalizedSlug,
-        status: { $ne: 'cancelled' }
-      });
-      
-      if (registeredCount >= event.capacity) {
+    // Atomically reserve a slot - only check capacity if capacity is defined and > 0
+    if (event.capacity !== null && event.capacity > 0) {
+      const reservation = await eventsCollection.findOneAndUpdate(
+        {
+          slug: normalizedSlug,
+          $expr: {
+            $gt: ['$capacity', { $ifNull: ['$registeredCount', 0] }]
+          }
+        },
+        [
+          {
+            $set: {
+              registeredCount: { $add: [{ $ifNull: ['$registeredCount', 0] }, 1] }
+            }
+          }
+        ],
+        { returnDocument: 'after' }
+      );
+
+      if (!reservation.value) {
         return res.status(409).json({
           success: false,
           message: 'Event is full',
@@ -639,6 +658,22 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
           errorCode: 'EVENT_FULL'
         });
       }
+
+      capacityReserved = true;
+    } else {
+      // If capacity is null or 0, just increment the count without checking
+      await eventsCollection.findOneAndUpdate(
+        { slug: normalizedSlug },
+        [
+          {
+            $set: {
+              registeredCount: { $add: [{ $ifNull: ['$registeredCount', 0] }, 1] }
+            }
+          }
+        ],
+        { returnDocument: 'after' }
+      );
+      capacityReserved = false;
     }
 
     // Check if email already registered for this event - DISABLED to allow duplicate registrations
@@ -755,6 +790,15 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
 
   } catch (error) {
     console.error('❌ Registration error:', error.message);
+
+    // Roll back capacity reservation on failure
+    if (capacityReserved) {
+      try {
+        await eventsCollection.updateOne({ slug: normalizedSlug }, { $inc: { registeredCount: -1 } });
+      } catch (rollbackErr) {
+        console.error('⚠️  Failed to roll back capacity reservation:', rollbackErr.message);
+      }
+    }
     
     // Handle duplicate key errors
     if (error.code === 11000) {
