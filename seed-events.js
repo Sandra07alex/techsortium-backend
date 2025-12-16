@@ -1,7 +1,7 @@
 import { MongoClient } from 'mongodb';
 import 'dotenv/config';
 
-const events = [
+export const events = [
   {
     id: "w1",
     title: "ThinkUX — UX & Cognitive Science",
@@ -25,6 +25,20 @@ const events = [
     longDescription: "Understand contemporary cyber threats and defence strategies. Speaker: Sukesh S — Founder, ASTROLABZ & Project Coordinator, IEEE LINK. Event Date: 2025-12-16T20:00:00.",
     posterUrl: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&auto=format&fit=crop",
     datetime: "2025-12-16T20:00:00",
+    capacity: null,
+    fee: null,
+    qrPaymentRequired: false,
+    requirements: ["Laptop recommended"]
+  },
+  {
+    id: "w3",
+    title: "Computer Vision 101",
+    slug: "computer-vision-101",
+    track: "workshops",
+    shortDescription: "Beginner-friendly intro to how machines understand visual data.",
+    longDescription: "Step into the world where computers learn to see. Computer Vision 101 introduces the fundamentals of how machines interpret and understand visual data. Led by Deva Nanda Nair, Technical Community Coordinator at IEEE LINK, covering core concepts, real-world applications, and how computer vision powers technologies like facial recognition, medical imaging, and autonomous systems. Event Date: 2025-12-18T20:00:00.",
+    posterUrl: "https://images.unsplash.com/photo-1518779578993-ec3579fee39f?w=800&auto=format&fit=crop",
+    datetime: "2025-12-18T20:00:00",
     capacity: null,
     fee: null,
     qrPaymentRequired: false,
@@ -252,6 +266,8 @@ async function seedEvents() {
     console.log('\n✅ Seeding complete!');
   }
 }
+
+export default events;
 
 seedEvents();
 
