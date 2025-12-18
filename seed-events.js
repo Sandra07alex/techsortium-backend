@@ -45,6 +45,20 @@ export const events = [
     requirements: ["Laptop recommended"]
   },
   {
+    id: "w4",
+    title: "RAG in AI Systems — Retrieval Augmented Generation",
+    slug: "rag-ai-systems",
+    track: "workshops",
+    shortDescription: "Master Retrieval Augmented Generation (RAG) - how modern AI systems become smarter and more accurate.",
+    longDescription: "Explore how modern AI systems become smarter, more accurate, and context-aware through Retrieval Augmented Generation (RAG) in this end-to-end technical workshop.\n\nIEEE Techsortium'25, powered by IEEE LINK, presents a deep dive into how AI models retrieve real-world knowledge, enhance large language models, and deliver intelligent, reliable responses.\n\nThe session will be led by B Pranavkrishna Vadhyar, AI Consultant at Hashroot and Founder of Core.ai Technical Community, who will walk participants through practical concepts, architectures, and real-world use cases of RAG-based systems.\n\n🗓 Date: 20 December 2025\n⏰ Time: 8:00 PM\n📍 Venue: Google Meet\n\nThis workshop is ideal for students and developers curious about building intelligent AI systems that combine data retrieval with generative models.",
+    posterUrl: "https://images.unsplash.com/photo-1677442d019e157c3c2e8520444b68603b786bbe?w=800&auto=format&fit=crop",
+    datetime: "2025-12-20T20:00:00",
+    capacity: null,
+    fee: null,
+    qrPaymentRequired: false,
+    requirements: ["Laptop recommended", "Basic understanding of AI/ML concepts"]
+  },
+  {
     id: "c1",
     title: "Web Development Competition",
     slug: "web-development-competition",
