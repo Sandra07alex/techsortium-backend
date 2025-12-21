@@ -59,6 +59,20 @@ export const events = [
     requirements: ["Laptop recommended", "Basic understanding of AI/ML concepts"]
   },
   {
+    id: "w5",
+    title: "CloudOps 101 — Modern Cloud Computing",
+    slug: "cloudops-101",
+    track: "workshops",
+    shortDescription: "Explore the fundamentals of scalable and intelligent cloud computing.",
+    longDescription: "Explore the fundamentals of scalable and intelligent cloud computing in this introductory workshop on modern cloud operations.\n\nIEEE Techsortium'25, powered by IEEE LINK, presents CloudOps 101, a session designed to open the door to cloud platforms, infrastructure management, and operational practices that power today's digital applications.\n\nThe workshop will be led by Abdul Hakkeem P A, MLOps Researcher, who will guide participants through core cloud concepts, real-world use cases, and how cloud systems support scalable and intelligent solutions.\n\n🗓 Date: 22 December 2025\n⏰ Time: 8:00 PM\n📍 Venue: Google Meet\n\nThis session is ideal for students and beginners who are curious about how cloud platforms manage infrastructure at scale and enable modern intelligent systems.",
+    posterUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop",
+    datetime: "2025-12-22T20:00:00",
+    capacity: null,
+    fee: null,
+    qrPaymentRequired: false,
+    requirements: ["Laptop recommended", "Basic understanding of cloud concepts helpful"]
+  },
+  {
     id: "c1",
     title: "Web Development Competition",
     slug: "web-development-competition",
