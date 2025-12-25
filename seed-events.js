@@ -87,6 +87,20 @@ export const events = [
     requirements: ["Laptop recommended", "Basic understanding of IoT/MQTT helpful"]
   },
   {
+    id: "w7",
+    title: "Brand You — Personal Branding on LinkedIn",
+    slug: "brand-you",
+    track: "workshops",
+    shortDescription: "Build your professional identity and strengthen your presence on LinkedIn.",
+    longDescription: "Learn how to build, position, and strengthen your professional identity in the digital world through this focused session on personal branding.\n\nIEEE Techsortium'25, powered by IEEE LINK, presents Brand You, a practical session designed to help you create a strong and authentic presence on LinkedIn. The workshop covers strategies to showcase your skills effectively, communicate your value, and connect with the right professional opportunities.\n\nThe session will be led by Adil A, Technical Coordinator, IEEE SPS Kerala Chapter, who will share actionable insights and best practices for personal branding in today's competitive landscape.\n\n🗓 Date: 27 December 2025\n⏰ Time: 8:00 PM\n📍 Venue: Google Meet\n\nThis session is ideal for students and early professionals looking to build visibility, credibility, and meaningful connections on LinkedIn.",
+    posterUrl: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&auto=format&fit=crop",
+    datetime: "2025-12-27T20:00:00",
+    capacity: null,
+    fee: null,
+    qrPaymentRequired: false,
+    requirements: ["Laptop recommended", "LinkedIn profile setup helpful"]
+  },
+  {
     id: "c1",
     title: "Web Development Competition",
     slug: "web-development-competition",
