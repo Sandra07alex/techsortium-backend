@@ -375,11 +375,28 @@ const uploadToImgBB = async (imageBuffer, imageName) => {
         deleteUrl: response.data.data.delete_url,
       };
     } else {
-      throw new Error('ImgBB upload failed');
+      console.error('ImgBB API returned unsuccessful response:', response.data);
+      throw new Error(`ImgBB upload failed: ${JSON.stringify(response.data)}`);
     }
   } catch (error) {
-    console.error('ImgBB upload error:', error.message);
-    throw new Error('Failed to upload image to ImgBB: ' + error.message);
+    // Log detailed error information
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      console.error('ImgBB API error response:', {
+        status: error.response.status,
+        statusText: error.response.statusText,
+        data: error.response.data
+      });
+      throw new Error(`ImgBB API error (${error.response.status}): ${JSON.stringify(error.response.data)}`);
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.error('ImgBB no response received:', error.message);
+      throw new Error('No response from ImgBB - network or timeout issue');
+    } else {
+      // Something happened in setting up the request
+      console.error('ImgBB upload setup error:', error.message);
+      throw new Error('Failed to upload image to ImgBB: ' + error.message);
+    }
   }
 };
 
@@ -828,32 +845,44 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
 
     if (paymentDone && req.file) {
       if (!process.env.IMGBB_API_KEY) {
-        console.warn('⚠️  IMGBB_API_KEY not set; skipping screenshot upload.');
-        paymentScreenshotUrl = '[pending: no API key]';
-      } else {
-        // Store placeholder immediately and upload async in background
-        paymentScreenshotUrl = '[pending upload...]';
+        const errorMsg = '⚠️  IMGBB_API_KEY not set; cannot upload screenshot.';
+        console.warn(errorMsg);
+        return res.status(500).json({
+          success: false,
+          message: 'Payment screenshot upload failed - API key not configured',
+          errorCode: 'IMGBB_CONFIG_ERROR'
+        });
+      }
+
+      try {
+        console.log(`📤 Uploading payment screenshot to ImgBB...`);
+        const uploadResult = await uploadToImgBB(
+          req.file.buffer,
+          `payment_${eventSlug}_${Date.now()}`
+        );
+
+        if (!uploadResult || !uploadResult.success) {
+          throw new Error('Upload failed - no success response from ImgBB');
+        }
+
+        paymentScreenshotUrl = uploadResult.url;
+        paymentScreenshotDeleteUrl = uploadResult.deleteUrl;
+        console.log(`✅ Payment screenshot uploaded successfully`);
+      } catch (uploadError) {
+        console.error('❌ ImgBB upload error:', uploadError.message);
+        console.error('Upload error details:', {
+          fileName: req.file.originalname,
+          fileSize: req.file.size,
+          mimeType: req.file.mimetype,
+          error: uploadError.message
+        });
         
-        // Fire async upload without blocking response
-        const regId = registrationId;
-        uploadToImgBB(req.file.buffer, `payment_${eventSlug}_${Date.now()}`)
-          .then((uploadResult) => {
-            if (uploadResult && uploadResult.success) {
-              registrationsCollection.updateOne(
-                { registrationId: regId },
-                {
-                  $set: {
-                    paymentScreenshotUrl: uploadResult.url,
-                    paymentScreenshotDeleteUrl: uploadResult.deleteUrl,
-                    updatedAt: new Date(),
-                  }
-                }
-              ).catch((err) => console.error('⚠️  Failed to update screenshot URL:', err.message));
-            }
-          })
-          .catch((err) => {
-            console.error('⚠️  Async screenshot upload failed:', err.message);
-          });
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to upload payment screenshot. Please try again or contact support.',
+          errorCode: 'IMGBB_UPLOAD_ERROR',
+          details: uploadError.message
+        });
       }
     }
 
