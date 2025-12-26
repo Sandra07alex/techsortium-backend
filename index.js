@@ -11,6 +11,41 @@ import compression from 'compression';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// SDS domain options for validation
+const SDS_DOMAINS = [
+  'Artificial Intelligence & Machine Learning',
+  'Data Science & Analytics',
+  'Full Stack Web Development',
+  'UI/UX Design & Product Thinking',
+  'Cyber Security',
+  'Computer Vision',
+];
+
+// Map normalized domain keys to human-friendly labels (for SDS stats)
+const DOMAIN_KEY_TO_LABEL = {
+  'ai-ml': 'Artificial Intelligence & Machine Learning',
+  'data-science': 'Data Science & Analytics',
+  'full-stack-web': 'Full Stack Web Development',
+  'ui-ux': 'UI/UX Design & Product Thinking',
+  'cyber-security': 'Cyber Security',
+  'computer-vision': 'Computer Vision',
+};
+
+// Normalize a domain label to a safe key for Mongo updates
+const normalizeDomainKey = (domain) => {
+  const d = (domain || '').toString().trim().toLowerCase();
+  if (!d) return 'unknown';
+  // Simple mapping to stable keys used in seeding
+  if (d.includes('artificial') && d.includes('machine')) return 'ai-ml';
+  if (d.includes('data') && d.includes('analytics')) return 'data-science';
+  if (d.includes('full') && d.includes('web')) return 'full-stack-web';
+  if (d.includes('ui') && d.includes('ux')) return 'ui-ux';
+  if (d.includes('cyber')) return 'cyber-security';
+  if (d.includes('computer') && d.includes('vision')) return 'computer-vision';
+  // Fallback: remove non-word chars and collapse spaces
+  return d.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'unknown';
+};
+
 // Normalize event slugs and handle known aliases
 const normalizeSlug = (slug) => {
   const safe = (slug || '').toString().trim().toLowerCase();
@@ -358,6 +393,7 @@ const validateRegistration = (req, res, next) => {
     college,
     semester,
     branch,
+    domain,
     isIEEEMember,
     membershipGrade,
     membershipNumber,
@@ -384,6 +420,17 @@ const validateRegistration = (req, res, next) => {
     if (!normalizedSlug || normalizedSlug.length < 1) {
       errors.push('Event slug is required');
     }
+
+  // SDS-specific: validate domain selection
+  const normalizedDomain = typeof domain === 'string' ? domain.trim() : '';
+  req.body.domain = normalizedDomain || undefined;
+  if (normalizedSlug === 'skill-development-session') {
+    if (!normalizedDomain) {
+      errors.push('Domain selection is required for SDS');
+    } else if (!SDS_DOMAINS.includes(normalizedDomain)) {
+      errors.push('Selected domain is not valid for SDS');
+    }
+  }
 
   // Validate name
   if (!name || name.trim().length < 2) {
@@ -583,6 +630,69 @@ app.get('/api/events/:slug', async (req, res) => {
   }
 });
 
+// Domain breakdown (SDS) endpoint
+app.get('/api/events/:slug/domain-stats', async (req, res) => {
+  try {
+    await connectDB();
+    if (!eventsCollection) {
+      return res.status(503).json({
+        success: false,
+        message: 'Service temporarily unavailable',
+        error: 'Database not connected'
+      });
+    }
+
+    const normalizedSlug = normalizeSlug(req.params.slug);
+    const event = await eventsCollection.findOne({ slug: normalizedSlug });
+
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: 'Event not found',
+        attemptedSlug: normalizedSlug
+      });
+    }
+
+    // Only provide detailed domain stats for SDS track
+    if (event.track !== 'sds') {
+      return res.json({
+        success: true,
+        eventSlug: event.slug,
+        track: event.track,
+        registeredCount: event.registeredCount || 0,
+        capacity: event.capacity ?? null,
+        domains: [],
+        stats: []
+      });
+    }
+
+    const counts = event.domainCounts || {};
+    const stats = Object.keys(DOMAIN_KEY_TO_LABEL).map((key) => ({
+      key,
+      label: DOMAIN_KEY_TO_LABEL[key],
+      count: Number(counts[key] || 0),
+      capacityPerDomain: null // Infinite per-domain capacity for SDS
+    }));
+
+    return res.json({
+      success: true,
+      eventSlug: event.slug,
+      track: event.track,
+      registeredCount: event.registeredCount || 0,
+      capacity: null, // Treat SDS overall capacity as not-enforced for display
+      domains: event.domains || SDS_DOMAINS,
+      stats
+    });
+  } catch (error) {
+    console.error('Error fetching domain stats:', error.message);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch domain stats',
+      error: error.message
+    });
+  }
+});
+
 // Register for an event
 app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'), validateRegistration, async (req, res) => {
   const registrationStartTime = Date.now();
@@ -607,6 +717,7 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
       college,
       semester,
       branch,
+      domain,
       isIEEEMember,
       membershipGrade,
       membershipNumber,
@@ -631,49 +742,44 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
       });
     }
 
-    // Atomically reserve a slot - only check capacity if capacity is defined and > 0
-    if (event.capacity !== null && event.capacity > 0) {
-      const reservation = await eventsCollection.findOneAndUpdate(
-        {
-          slug: normalizedSlug,
-          $expr: {
-            $gt: ['$capacity', { $ifNull: ['$registeredCount', 0] }]
-          }
-        },
-        [
-          {
-            $set: {
-              registeredCount: { $add: [{ $ifNull: ['$registeredCount', 0] }, 1] }
-            }
-          }
-        ],
-        { returnDocument: 'after' }
-      );
-
-      if (!reservation.value) {
-        return res.status(409).json({
-          success: false,
-          message: 'Event is full',
-          error: 'This event has reached its capacity limit',
-          errorCode: 'EVENT_FULL'
-        });
-      }
-
-      capacityReserved = true;
-    } else {
-      // If capacity is null or 0, just increment the count without checking
-      await eventsCollection.findOneAndUpdate(
+    // SDS: per-domain capacity is infinite; skip capacity checks and increment counts
+    if (event.track === 'sds') {
+      const domainKey = normalizeDomainKey(domain);
+      await eventsCollection.updateOne(
         { slug: normalizedSlug },
-        [
-          {
-            $set: {
-              registeredCount: { $add: [{ $ifNull: ['$registeredCount', 0] }, 1] }
-            }
-          }
-        ],
-        { returnDocument: 'after' }
+        { $inc: { registeredCount: 1, [`domainCounts.${domainKey}`]: 1 } }
       );
       capacityReserved = false;
+    } else {
+      // Other events: enforce overall capacity when defined and > 0
+      if (event.capacity !== null && event.capacity > 0) {
+        const reservation = await eventsCollection.findOneAndUpdate(
+          {
+            slug: normalizedSlug,
+            $expr: { $gt: ['$capacity', { $ifNull: ['$registeredCount', 0] }] }
+          },
+          { $inc: { registeredCount: 1 } },
+          { returnDocument: 'after' }
+        );
+
+        if (!reservation || !reservation.value) {
+          return res.status(409).json({
+            success: false,
+            message: 'Event is full',
+            error: 'This event has reached its capacity limit',
+            errorCode: 'EVENT_FULL'
+          });
+        }
+
+        capacityReserved = true;
+      } else {
+        // If capacity is null or 0, just increment the count without checking
+        await eventsCollection.updateOne(
+          { slug: normalizedSlug },
+          { $inc: { registeredCount: 1 } }
+        );
+        capacityReserved = false;
+      }
     }
 
     // Check if email already registered for this event - DISABLED to allow duplicate registrations
@@ -713,33 +819,43 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
     //   }
     // }
 
-    // Upload payment screenshot if provided
+    // Generate registration ID first (needed for async upload callback)
+    const registrationId = generateRegistrationId();
+
+    // Upload payment screenshot if provided (non-blocking for fast response)
     let paymentScreenshotUrl = null;
     let paymentScreenshotDeleteUrl = null;
 
     if (paymentDone && req.file) {
       if (!process.env.IMGBB_API_KEY) {
-        // Skip external upload to avoid long waits when the API key is missing
         console.warn('⚠️  IMGBB_API_KEY not set; skipping screenshot upload.');
-        paymentScreenshotUrl = '[not uploaded: IMGBB_API_KEY missing]';
+        paymentScreenshotUrl = '[pending: no API key]';
       } else {
-        console.log(`📤 Uploading payment screenshot to ImgBB...`);
-        const uploadResult = await uploadToImgBB(
-          req.file.buffer,
-          `payment_${eventSlug}_${Date.now()}`
-        );
-
-        if (!uploadResult.success) {
-          throw new Error('Failed to upload payment screenshot');
-        }
-
-        paymentScreenshotUrl = uploadResult.url;
-        paymentScreenshotDeleteUrl = uploadResult.deleteUrl;
+        // Store placeholder immediately and upload async in background
+        paymentScreenshotUrl = '[pending upload...]';
+        
+        // Fire async upload without blocking response
+        const regId = registrationId;
+        uploadToImgBB(req.file.buffer, `payment_${eventSlug}_${Date.now()}`)
+          .then((uploadResult) => {
+            if (uploadResult && uploadResult.success) {
+              registrationsCollection.updateOne(
+                { registrationId: regId },
+                {
+                  $set: {
+                    paymentScreenshotUrl: uploadResult.url,
+                    paymentScreenshotDeleteUrl: uploadResult.deleteUrl,
+                    updatedAt: new Date(),
+                  }
+                }
+              ).catch((err) => console.error('⚠️  Failed to update screenshot URL:', err.message));
+            }
+          })
+          .catch((err) => {
+            console.error('⚠️  Async screenshot upload failed:', err.message);
+          });
       }
     }
-
-    // Generate registration ID
-    const registrationId = generateRegistrationId();
 
     // Prepare registration document
     const registrationDoc = {
@@ -752,6 +868,8 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
       college: college.trim(),
       semester: semester,
       branch: branch.trim(),
+      // SDS-specific fields
+      domain: event.track === 'sds' ? (domain || null) : undefined,
       isIEEEMember: isIEEEMember,
       paymentDone: paymentDone,
       paymentScreenshotUrl: paymentScreenshotUrl,
@@ -760,6 +878,16 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
       createdAt: new Date(),
       updatedAt: new Date(),
     };
+
+    // Fee expectation: SDS members ₹200, non-members ₹400
+    if (event.track === 'sds') {
+      registrationDoc.expectedFee = isIEEEMember ? 200 : 400;
+      registrationDoc.feeCurrency = 'INR';
+      registrationDoc.feeDescription = 'IEEE Members: ₹200 | Non-IEEE Members: ₹400';
+    } else if (typeof event.fee === 'number') {
+      registrationDoc.expectedFee = event.fee;
+      registrationDoc.feeCurrency = 'INR';
+    }
 
     // Attach membership fields only when applicable to avoid null unique collisions
     if (isIEEEMember && normalizedMembershipNumber) {
