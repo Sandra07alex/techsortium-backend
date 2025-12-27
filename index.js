@@ -13,22 +13,22 @@ const PORT = process.env.PORT || 5000;
 
 // SDS domain options for validation
 const SDS_DOMAINS = [
-  'Artificial Intelligence & Machine Learning',
-  'Data Science & Analytics',
-  'Full Stack Web Development',
-  'UI/UX Design & Product Thinking',
   'Cyber Security',
-  'Computer Vision',
+  'Full Stack Web Development',
+  'Cloud (AWS)',
+  'Data Science and Analytics',
+  'Artificial Intelligence and Machine Learning',
+  'Generative AI',
 ];
 
 // Map normalized domain keys to human-friendly labels (for SDS stats)
 const DOMAIN_KEY_TO_LABEL = {
-  'ai-ml': 'Artificial Intelligence & Machine Learning',
-  'data-science': 'Data Science & Analytics',
-  'full-stack-web': 'Full Stack Web Development',
-  'ui-ux': 'UI/UX Design & Product Thinking',
   'cyber-security': 'Cyber Security',
-  'computer-vision': 'Computer Vision',
+  'full-stack-web': 'Full Stack Web Development',
+  'cloud-aws': 'Cloud (AWS)',
+  'data-science': 'Data Science and Analytics',
+  'ai-ml': 'Artificial Intelligence and Machine Learning',
+  'generative-ai': 'Generative AI',
 };
 
 // Normalize a domain label to a safe key for Mongo updates
@@ -39,9 +39,9 @@ const normalizeDomainKey = (domain) => {
   if (d.includes('artificial') && d.includes('machine')) return 'ai-ml';
   if (d.includes('data') && d.includes('analytics')) return 'data-science';
   if (d.includes('full') && d.includes('web')) return 'full-stack-web';
-  if (d.includes('ui') && d.includes('ux')) return 'ui-ux';
+  if (d.includes('cloud') && d.includes('aws')) return 'cloud-aws';
   if (d.includes('cyber')) return 'cyber-security';
-  if (d.includes('computer') && d.includes('vision')) return 'computer-vision';
+  if (d.includes('generative')) return 'generative-ai';
   // Fallback: remove non-word chars and collapse spaces
   return d.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'unknown';
 };
