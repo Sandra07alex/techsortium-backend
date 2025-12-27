@@ -1,0 +1,398 @@
+[
+  {
+    "_id": "694166192c5c05867b0084d0",
+    "id": "w3",
+    "title": "Computer Vision 101",
+    "slug": "computer-vision-101",
+    "track": "workshops",
+    "shortDescription": "Beginner-friendly intro to how machines understand visual data.",
+    "longDescription": "Step into the world where computers learn to see. Computer Vision 101 introduces the fundamentals of how machines interpret and understand visual data. Led by Deva Nanda Nair, Technical Community Coordinator at IEEE LINK, covering core concepts, real-world applications, and how computer vision powers technologies like facial recognition, medical imaging, and autonomous systems.",
+    "posterUrl": "https://images.unsplash.com/photo-1518779578993-ec3579fee39f?w=800&auto=format&fit=crop",
+    "datetime": "2025-12-18T20:00:00",
+    "capacity": null,
+    "fee": null,
+    "qrPaymentRequired": false,
+    "requirements": [
+      "Laptop recommended"
+    ],
+    "registeredCount": 50
+  },
+  {
+    "_id": "694166f5cd505cf4da3b4c97",
+    "id": "w1",
+    "title": "ThinkUX — UX & Cognitive Science",
+    "slug": "thinkux",
+    "track": "workshops",
+    "shortDescription": "UX & Cognitive Science Workshop",
+    "longDescription": "Explore how cognitive science informs user experience design. Speaker: Brian Roy Mathew — UX strategist @ Cenit Labs & Research Activities Coordinator, IEEE EdSoc Kerala Chapter SLT. Event Date: 2025-12-15T20:00:00.",
+    "posterUrl": "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&auto=format&fit=crop",
+    "datetime": "2025-12-15T20:00:00",
+    "capacity": null,
+    "fee": null,
+    "qrPaymentRequired": false,
+    "requirements": [
+      "Laptop recommended"
+    ]
+  },
+  {
+    "_id": "694166f5cd505cf4da3b4c98",
+    "id": "w2",
+    "title": "TejasGuard — Cyber Security Workshop",
+    "slug": "tejasguard",
+    "track": "workshops",
+    "shortDescription": "Session in Cyber Threats and Defence",
+    "longDescription": "Understand contemporary cyber threats and defence strategies. Speaker: Sukesh S — Founder, ASTROLABZ & Project Coordinator, IEEE LINK. Event Date: 2025-12-16T20:00:00.",
+    "posterUrl": "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&auto=format&fit=crop",
+    "datetime": "2025-12-16T20:00:00",
+    "capacity": null,
+    "fee": null,
+    "qrPaymentRequired": false,
+    "requirements": [
+      "Laptop recommended"
+    ]
+  },
+  {
+    "_id": "694166f6cd505cf4da3b4c99",
+    "id": "c1",
+    "title": "Web Development Competition",
+    "slug": "web-development-competition",
+    "track": "competitions",
+    "shortDescription": "Design and develop a complete web application.",
+    "longDescription": "Compete in this web development competition. Build a fully functional web application based on given requirements. Judged on creativity, functionality, code quality, and user experience.",
+    "posterUrl": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop",
+    "datetime": "2024-03-18T10:00:00",
+    "capacity": 100,
+    "fee": 50,
+    "qrPaymentRequired": true,
+    "prizes": [
+      "1st: ₹25,000",
+      "2nd: ₹15,000",
+      "3rd: ₹10,000"
+    ]
+  },
+  {
+    "_id": "694166f6cd505cf4da3b4c9a",
+    "id": "c2",
+    "title": "UI/UX Competition",
+    "slug": "uiux-competition",
+    "track": "competitions",
+    "shortDescription": "Create stunning user interfaces and user experiences.",
+    "longDescription": "Showcase your design skills in this UI/UX competition. Design a complete user interface for a given problem statement, focusing on aesthetics, usability, and user experience. Tools of your choice allowed.",
+    "posterUrl": "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&auto=format&fit=crop",
+    "datetime": "2024-03-19T10:00:00",
+    "capacity": 80,
+    "fee": 50,
+    "qrPaymentRequired": true,
+    "prizes": [
+      "1st: ₹18,000",
+      "2nd: ₹10,000",
+      "3rd: ₹6,000"
+    ]
+  },
+  {
+    "_id": "694166f6cd505cf4da3b4c9b",
+    "id": "c3",
+    "title": "Script Writing Competition",
+    "slug": "script-writing-competition",
+    "track": "competitions",
+    "shortDescription": "Write compelling scripts and storytelling.",
+    "longDescription": "Put your creative writing skills to the test. Write original scripts for short films, plays, or other media based on given themes. Judged on originality, narrative structure, and dialogue quality.",
+    "posterUrl": "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&auto=format&fit=crop",
+    "datetime": "2024-03-20T10:00:00",
+    "capacity": 70,
+    "fee": 50,
+    "qrPaymentRequired": true,
+    "prizes": [
+      "1st: ₹15,000",
+      "2nd: ₹9,000",
+      "3rd: ₹5,000"
+    ]
+  },
+  {
+    "_id": "694166f6cd505cf4da3b4c9c",
+    "id": "c4",
+    "title": "Poster Designing Competition",
+    "slug": "poster-designing-competition",
+    "track": "competitions",
+    "shortDescription": "Design eye-catching and impactful posters.",
+    "longDescription": "Showcase your graphic design skills by creating visually appealing posters. Design posters for given themes or messages. Judged on visual impact, creativity, typography, and message clarity.",
+    "posterUrl": "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&auto=format&fit=crop",
+    "datetime": "2024-03-21T10:00:00",
+    "capacity": 75,
+    "fee": 50,
+    "qrPaymentRequired": true,
+    "prizes": [
+      "1st: ₹14,000",
+      "2nd: ₹8,500",
+      "3rd: ₹5,000"
+    ]
+  },
+  {
+    "_id": "694166f6cd505cf4da3b4c9d",
+    "id": "c5",
+    "title": "Airplane Designing Competition",
+    "slug": "airplane-designing-competition",
+    "track": "competitions",
+    "shortDescription": "Design innovative aircraft concepts.",
+    "longDescription": "Challenge your engineering and design skills by conceptualizing and designing innovative airplane models. Consider aerodynamics, efficiency, and innovation. Judged on technical merit, creativity, and feasibility.",
+    "posterUrl": "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=800&auto=format&fit=crop",
+    "datetime": "2024-03-22T10:00:00",
+    "capacity": 60,
+    "fee": 50,
+    "qrPaymentRequired": true,
+    "prizes": [
+      "1st: ₹20,000",
+      "2nd: ₹12,000",
+      "3rd: ₹7,000"
+    ]
+  },
+  {
+    "_id": "694166f7cd505cf4da3b4c9e",
+    "id": "c6",
+    "title": "Video Editing Competition",
+    "slug": "video-editing-competition",
+    "track": "competitions",
+    "shortDescription": "Create compelling video content through editing.",
+    "longDescription": "Demonstrate your video editing expertise by creating professional videos from given raw footage or creating original content. Judged on editing quality, pacing, effects, and storytelling.",
+    "posterUrl": "https://images.unsplash.com/photo-1551512519-2ca7cc56f2bb?w=800&auto=format&fit=crop",
+    "datetime": "2024-03-23T10:00:00",
+    "capacity": 65,
+    "fee": 50,
+    "qrPaymentRequired": true,
+    "prizes": [
+      "1st: ₹17,000",
+      "2nd: ₹10,000",
+      "3rd: ₹6,000"
+    ]
+  },
+  {
+    "_id": "694166f7cd505cf4da3b4c9f",
+    "id": "c7",
+    "title": "Social Experiments Competition",
+    "slug": "social-experiments-competition",
+    "track": "competitions",
+    "shortDescription": "Conduct creative social experiments and analysis.",
+    "longDescription": "Design and execute innovative social experiments. Analyze human behavior, social trends, or societal issues through creative experimentation. Judged on methodology, insights, and presentation.",
+    "posterUrl": "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&auto=format&fit=crop",
+    "datetime": "2024-03-24T10:00:00",
+    "capacity": 55,
+    "fee": 50,
+    "qrPaymentRequired": true,
+    "prizes": [
+      "1st: ₹16,000",
+      "2nd: ₹9,500",
+      "3rd: ₹5,500"
+    ]
+  },
+  {
+    "_id": "694166f7cd505cf4da3b4ca0",
+    "id": "c8",
+    "title": "Event Drafting Competition",
+    "slug": "event-drafting-competition",
+    "track": "competitions",
+    "shortDescription": "Plan and draft innovative event concepts.",
+    "longDescription": "Show your event management and planning skills by drafting detailed event proposals. Create comprehensive event plans including logistics, budget, marketing, and execution strategies.",
+    "posterUrl": "https://images.unsplash.com/photo-1540575467063-178f50902f87?w=800&auto=format&fit=crop",
+    "datetime": "2024-03-25T10:00:00",
+    "capacity": 70,
+    "fee": 50,
+    "qrPaymentRequired": true,
+    "prizes": [
+      "1st: ₹15,000",
+      "2nd: ₹9,000",
+      "3rd: ₹5,000"
+    ]
+  },
+  {
+    "_id": "694166f7cd505cf4da3b4ca1",
+    "id": "c9",
+    "title": "Presentation Making Competition",
+    "slug": "presentation-making-competition",
+    "track": "competitions",
+    "shortDescription": "Create and deliver compelling presentations.",
+    "longDescription": "Design and deliver impactful presentations on given or self-chosen topics. Judged on slide design, content quality, delivery, and audience engagement.",
+    "posterUrl": "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&auto=format&fit=crop",
+    "datetime": "2024-03-26T10:00:00",
+    "capacity": 80,
+    "fee": 50,
+    "qrPaymentRequired": true,
+    "prizes": [
+      "1st: ₹14,000",
+      "2nd: ₹8,500",
+      "3rd: ₹5,000"
+    ]
+  },
+  {
+    "_id": "694166f7cd505cf4da3b4ca2",
+    "id": "c10",
+    "title": "Debate Competition",
+    "slug": "debate-competition",
+    "track": "competitions",
+    "shortDescription": "Showcase your argumentation and public speaking skills.",
+    "longDescription": "Participate in structured debate competitions on various topics. Demonstrate critical thinking, argumentation skills, and public speaking abilities. Judged on argument quality, delivery, and rebuttals.",
+    "posterUrl": "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&auto=format&fit=crop",
+    "datetime": "2024-03-27T10:00:00",
+    "capacity": 85,
+    "fee": 50,
+    "qrPaymentRequired": true,
+    "prizes": [
+      "1st: ₹16,000",
+      "2nd: ₹9,500",
+      "3rd: ₹5,500"
+    ]
+  },
+  {
+    "_id": "694166f7cd505cf4da3b4ca3",
+    "id": "s1",
+    "title": "Git & GitHub Masterclass",
+    "slug": "git-masterclass",
+    "track": "sds",
+    "shortDescription": "Master version control and collaborative development workflows.",
+    "longDescription": "Learn professional Git workflows used in the industry. Understand branching strategies, pull requests, code reviews, and CI/CD integration. Perfect for beginners and those looking to improve their Git skills.",
+    "posterUrl": "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=800&auto=format&fit=crop",
+    "datetime": "2024-03-24T10:00:00",
+    "capacity": 80,
+    "fee": null,
+    "qrPaymentRequired": false
+  },
+  {
+    "_id": "694166f8cd505cf4da3b4ca4",
+    "id": "s2",
+    "title": "Resume Building & Interview Prep",
+    "slug": "resume-interview",
+    "track": "sds",
+    "shortDescription": "Craft the perfect tech resume and ace your interviews.",
+    "longDescription": "Get personalized guidance on building an impressive tech resume. Learn interview strategies, common coding interview patterns, and behavioral interview techniques from industry professionals.",
+    "posterUrl": "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=800&auto=format&fit=crop",
+    "datetime": "2024-03-25T14:00:00",
+    "capacity": 100,
+    "fee": null,
+    "qrPaymentRequired": false
+  },
+  {
+    "_id": "694166f8cd505cf4da3b4ca5",
+    "id": "s3",
+    "title": "Open Source Contribution Guide",
+    "slug": "opensource-guide",
+    "track": "sds",
+    "shortDescription": "Start your journey in open source development.",
+    "longDescription": "Discover how to find, evaluate, and contribute to open source projects. Understand open source licenses, community guidelines, and best practices for making meaningful contributions.",
+    "posterUrl": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop",
+    "datetime": "2024-03-26T11:00:00",
+    "capacity": 70,
+    "fee": null,
+    "qrPaymentRequired": false
+  },
+  {
+    "_id": "6943f57d3633e7275de8c88d",
+    "id": "w4",
+    "title": "RAG in AI Systems — Retrieval Augmented Generation",
+    "slug": "rag-ai-systems",
+    "track": "workshops",
+    "shortDescription": "Master Retrieval Augmented Generation (RAG) - how modern AI systems become smarter and more accurate.",
+    "longDescription": "Explore how modern AI systems become smarter, more accurate, and context-aware through Retrieval Augmented Generation (RAG) in this end-to-end technical workshop.\n\nIEEE Techsortium'25, powered by IEEE LINK, presents a deep dive into how AI models retrieve real-world knowledge, enhance large language models, and deliver intelligent, reliable responses.\n\nThe session will be led by B Pranavkrishna Vadhyar, AI Consultant at Hashroot and Founder of Core.ai Technical Community, who will walk participants through practical concepts, architectures, and real-world use cases of RAG-based systems.\n\n🗓 Date: 20 December 2025\n⏰ Time: 8:00 PM\n📍 Venue: Google Meet\n\nThis workshop is ideal for students and developers curious about building intelligent AI systems that combine data retrieval with generative models.",
+    "posterUrl": "https://images.unsplash.com/photo-1677442d019e157c3c2e8520444b68603b786bbe?w=800&auto=format&fit=crop",
+    "datetime": "2025-12-20T20:00:00",
+    "capacity": null,
+    "fee": null,
+    "qrPaymentRequired": false,
+    "requirements": [
+      "Laptop recommended",
+      "Basic understanding of AI/ML concepts"
+    ],
+    "registeredCount": 41
+  },
+  {
+    "_id": "694797344d7e2942e8e857d9",
+    "id": "w5",
+    "title": "CloudOps 101 — Modern Cloud Computing",
+    "slug": "cloudops-101",
+    "track": "workshops",
+    "shortDescription": "Explore the fundamentals of scalable and intelligent cloud computing.",
+    "longDescription": "Explore the fundamentals of scalable and intelligent cloud computing in this introductory workshop on modern cloud operations.\n\nIEEE Techsortium'25, powered by IEEE LINK, presents CloudOps 101, a session designed to open the door to cloud platforms, infrastructure management, and operational practices that power today's digital applications.\n\nThe workshop will be led by Abdul Hakkeem P A, MLOps Researcher, who will guide participants through core cloud concepts, real-world use cases, and how cloud systems support scalable and intelligent solutions.\n\n🗓 Date: 22 December 2025\n⏰ Time: 8:00 PM\n📍 Venue: Google Meet\n\nThis session is ideal for students and beginners who are curious about how cloud platforms manage infrastructure at scale and enable modern intelligent systems.",
+    "posterUrl": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop",
+    "datetime": "2025-12-22T20:00:00",
+    "capacity": null,
+    "fee": null,
+    "qrPaymentRequired": false,
+    "requirements": [
+      "Laptop recommended",
+      "Basic understanding of cloud concepts helpful"
+    ],
+    "registeredCount": 60
+  },
+  {
+    "_id": "6947a1410c76034ab38456da",
+    "id": "w6",
+    "title": "DataPulse — Real-Time Communication with MQTT",
+    "slug": "datapulse-mqtt",
+    "track": "workshops",
+    "shortDescription": "Hands-on MQTT for scalable, real-time IoT communication.",
+    "longDescription": "Explore the fundamentals of real-time and intelligent communication in this hands-on workshop focused on MQTT, the lightweight messaging protocol that powers modern IoT and connected systems.\n\nIEEE Techsortium'25, powered by IEEE LINK, presents DataPulse, a practical session that dives into how devices communicate efficiently, how real-time data flows across systems, and how MQTT enables scalable and reliable messaging.\n\nThe workshop will be led by Deva Prakash, YouTuber, Blogger, and Maker in Electronics, and Project Coordinator, IEEE SSCS Kerala Chapter, who will share practical insights, use cases, and demonstrations from real-world IoT applications.\n\n🗓 Date: 23 December 2025\n⏰ Time: 8:00 PM\n📍 Venue: Google Meet\n\nThis session is ideal for students and enthusiasts interested in IoT, embedded systems, and real-time data communication.",
+    "posterUrl": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&auto=format&fit=crop",
+    "datetime": "2025-12-23T20:00:00",
+    "capacity": null,
+    "fee": null,
+    "qrPaymentRequired": false,
+    "requirements": [
+      "Laptop recommended",
+      "Basic understanding of IoT/MQTT helpful"
+    ],
+    "registeredCount": 76
+  },
+  {
+    "_id": "694d4f8a92dfa383552a93e1",
+    "id": "w7",
+    "title": "Brand You — Personal Branding on LinkedIn",
+    "slug": "brand-you",
+    "track": "workshops",
+    "shortDescription": "Build your professional identity and strengthen your presence on LinkedIn.",
+    "longDescription": "Learn how to build, position, and strengthen your professional identity in the digital world through this focused session on personal branding.\n\nIEEE Techsortium'25, powered by IEEE LINK, presents Brand You, a practical session designed to help you create a strong and authentic presence on LinkedIn. The workshop covers strategies to showcase your skills effectively, communicate your value, and connect with the right professional opportunities.\n\nThe session will be led by Adil A, Technical Coordinator, IEEE SPS Kerala Chapter, who will share actionable insights and best practices for personal branding in today's competitive landscape.\n\n🗓 Date: 27 December 2025\n⏰ Time: 8:00 PM\n📍 Venue: Google Meet\n\nThis session is ideal for students and early professionals looking to build visibility, credibility, and meaningful connections on LinkedIn.",
+    "posterUrl": "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&auto=format&fit=crop",
+    "datetime": "2025-12-27T20:00:00",
+    "capacity": null,
+    "fee": null,
+    "qrPaymentRequired": false,
+    "requirements": [
+      "Laptop recommended",
+      "LinkedIn profile setup helpful"
+    ],
+    "registeredCount": 21
+  },
+  {
+    "_id": "694d6a7a101193cbca157964",
+    "id": "sds-main-2026",
+    "title": "Skill Development Session (SDS)",
+    "slug": "skill-development-session",
+    "track": "sds",
+    "shortDescription": "A structured learning initiative powered by IEEE LINK, designed to equip students with in-demand technical skills through guided learning and hands-on project experience.",
+    "longDescription": "Welcome to Skill Development Session (SDS) — a structured learning initiative on IEEE Techsortium 2025 powered by IEEE LINK, designed to equip students with in-demand technical skills through guided learning and hands-on project experience.\n\nSDS focuses on helping participants explore new technologies, build strong fundamentals, and gain practical exposure by working on a domain-specific project. The program bridges the gap between learning and real-world application, enabling students to understand how to grow and position themselves within a chosen technology domain.\n\n🎯 Why SDS?\nTired of endless theories? It's time to experience learning that actually feels real. Here in SDS, you will learn skills that actually matter beyond the classroom. When learning feels like SOS, SDS steps in.\n\n📅 Timeline\nStarting on January 1st 2026. Sessions on Jan 3 & 4 at 7 PM. Jan 5–8: Project development period.\n\n🎓 Domains\n• Artificial Intelligence & Machine Learning\n• Data Science & Analytics\n• Full Stack Web Development\n• UI/UX Design & Product Thinking\n• Cyber Security\n• Computer Vision\n\n⭐ Highlights\n• Live interactive sessions\n• Hands-on live projects\n• Mentoring from domain experts\n• Resume-ready project experience\n\n💡 Participant Gains\n• Practical domain project\n• Exposure to emerging technologies\n• Strengthened fundamentals\n• Guidance to keep learning\n\n⚡ Notes\n• Only 30 seats per domain\n• One domain per participant",
+    "posterUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781f?w=800&auto=format&fit=crop",
+    "datetime": "2026-01-01T00:00:00",
+    "capacity": 180,
+    "fee": 200,
+    "feeDescription": "IEEE Members: ₹200 | Non-IEEE Members: ₹400",
+    "qrPaymentRequired": true,
+    "requirements": [
+      "Choose one domain",
+      "Limited seats: 30 per domain"
+    ],
+    "domains": [
+      "Artificial Intelligence & Machine Learning",
+      "Data Science & Analytics",
+      "Full Stack Web Development",
+      "UI/UX Design & Product Thinking",
+      "Cyber Security",
+      "Computer Vision"
+    ],
+    "registeredCount": 9,
+    "domainCounts": {
+      "ai-ml": 0,
+      "data-science": 0,
+      "full-stack-web": 0,
+      "ui-ux": 0,
+      "cyber-security": 0,
+      "computer-vision": 0
+    }
+  }
+]

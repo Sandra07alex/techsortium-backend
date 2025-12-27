@@ -11,6 +11,41 @@ import compression from 'compression';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// SDS domain options for validation
+const SDS_DOMAINS = [
+  'Cyber Security',
+  'Full Stack Web Development',
+  'Cloud (AWS)',
+  'Data Science and Analytics',
+  'Artificial Intelligence and Machine Learning',
+  'Generative AI',
+];
+
+// Map normalized domain keys to human-friendly labels (for SDS stats)
+const DOMAIN_KEY_TO_LABEL = {
+  'cyber-security': 'Cyber Security',
+  'full-stack-web': 'Full Stack Web Development',
+  'cloud-aws': 'Cloud (AWS)',
+  'data-science': 'Data Science and Analytics',
+  'ai-ml': 'Artificial Intelligence and Machine Learning',
+  'generative-ai': 'Generative AI',
+};
+
+// Normalize a domain label to a safe key for Mongo updates
+const normalizeDomainKey = (domain) => {
+  const d = (domain || '').toString().trim().toLowerCase();
+  if (!d) return 'unknown';
+  // Simple mapping to stable keys used in seeding
+  if (d.includes('artificial') && d.includes('machine')) return 'ai-ml';
+  if (d.includes('data') && d.includes('analytics')) return 'data-science';
+  if (d.includes('full') && d.includes('web')) return 'full-stack-web';
+  if (d.includes('cloud') && d.includes('aws')) return 'cloud-aws';
+  if (d.includes('cyber')) return 'cyber-security';
+  if (d.includes('generative')) return 'generative-ai';
+  // Fallback: remove non-word chars and collapse spaces
+  return d.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'unknown';
+};
+
 // Normalize event slugs and handle known aliases
 const normalizeSlug = (slug) => {
   const safe = (slug || '').toString().trim().toLowerCase();
@@ -61,10 +96,12 @@ const corsOptions = {
       process.env.FRONTEND_URL || 'http://localhost:5173',
       'http://localhost:3000',
       'http://localhost:5173',
+      'http://localhost:5174',
       'http://localhost:8080', // Add port 8080 support
       'http://127.0.0.1:8080',
       'http://127.0.0.1:5173',
       'http://127.0.0.1:3000',
+      'https://techsortium-dashboard.vercel.app',
     ];
     // Allow requests with no origin (like mobile apps or curl requests)
     // In development, allow all localhost origins
@@ -122,6 +159,9 @@ app.use((req, res, next) => {
   
   // Allow localhost on any port in development
   if (origin && (origin.includes('localhost') || origin.includes('127.0.0.1'))) {
+    res.header('Access-Control-Allow-Origin', origin);
+  } else if (origin && origin.includes('vercel.app')) {
+    // Allow all vercel.app domains (including preview deployments)
     res.header('Access-Control-Allow-Origin', origin);
   } else {
     res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URL || '*');
@@ -232,7 +272,7 @@ const connectDB = async () => {
       tlsAllowInvalidCertificates: false,
       tlsAllowInvalidHostnames: false,
       // Add these for better compatibility with Vercel/serverless
-      maxPoolSize: 10,
+      maxPoolSize: 50, // allow moderate bursts
       minPoolSize: 1,
     };
 
@@ -335,11 +375,28 @@ const uploadToImgBB = async (imageBuffer, imageName) => {
         deleteUrl: response.data.data.delete_url,
       };
     } else {
-      throw new Error('ImgBB upload failed');
+      console.error('ImgBB API returned unsuccessful response:', response.data);
+      throw new Error(`ImgBB upload failed: ${JSON.stringify(response.data)}`);
     }
   } catch (error) {
-    console.error('ImgBB upload error:', error.message);
-    throw new Error('Failed to upload image to ImgBB: ' + error.message);
+    // Log detailed error information
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      console.error('ImgBB API error response:', {
+        status: error.response.status,
+        statusText: error.response.statusText,
+        data: error.response.data
+      });
+      throw new Error(`ImgBB API error (${error.response.status}): ${JSON.stringify(error.response.data)}`);
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.error('ImgBB no response received:', error.message);
+      throw new Error('No response from ImgBB - network or timeout issue');
+    } else {
+      // Something happened in setting up the request
+      console.error('ImgBB upload setup error:', error.message);
+      throw new Error('Failed to upload image to ImgBB: ' + error.message);
+    }
   }
 };
 
@@ -353,6 +410,7 @@ const validateRegistration = (req, res, next) => {
     college,
     semester,
     branch,
+    domain,
     isIEEEMember,
     membershipGrade,
     membershipNumber,
@@ -379,6 +437,17 @@ const validateRegistration = (req, res, next) => {
     if (!normalizedSlug || normalizedSlug.length < 1) {
       errors.push('Event slug is required');
     }
+
+  // SDS-specific: validate domain selection
+  const normalizedDomain = typeof domain === 'string' ? domain.trim() : '';
+  req.body.domain = normalizedDomain || undefined;
+  if (normalizedSlug === 'skill-development-session') {
+    if (!normalizedDomain) {
+      errors.push('Domain selection is required for SDS');
+    } else if (!SDS_DOMAINS.includes(normalizedDomain)) {
+      errors.push('Selected domain is not valid for SDS');
+    }
+  }
 
   // Validate name
   if (!name || name.trim().length < 2) {
@@ -578,10 +647,75 @@ app.get('/api/events/:slug', async (req, res) => {
   }
 });
 
+// Domain breakdown (SDS) endpoint
+app.get('/api/events/:slug/domain-stats', async (req, res) => {
+  try {
+    await connectDB();
+    if (!eventsCollection) {
+      return res.status(503).json({
+        success: false,
+        message: 'Service temporarily unavailable',
+        error: 'Database not connected'
+      });
+    }
+
+    const normalizedSlug = normalizeSlug(req.params.slug);
+    const event = await eventsCollection.findOne({ slug: normalizedSlug });
+
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: 'Event not found',
+        attemptedSlug: normalizedSlug
+      });
+    }
+
+    // Only provide detailed domain stats for SDS track
+    if (event.track !== 'sds') {
+      return res.json({
+        success: true,
+        eventSlug: event.slug,
+        track: event.track,
+        registeredCount: event.registeredCount || 0,
+        capacity: event.capacity ?? null,
+        domains: [],
+        stats: []
+      });
+    }
+
+    const counts = event.domainCounts || {};
+    const stats = Object.keys(DOMAIN_KEY_TO_LABEL).map((key) => ({
+      key,
+      label: DOMAIN_KEY_TO_LABEL[key],
+      count: Number(counts[key] || 0),
+      capacityPerDomain: null // Infinite per-domain capacity for SDS
+    }));
+
+    return res.json({
+      success: true,
+      eventSlug: event.slug,
+      track: event.track,
+      registeredCount: event.registeredCount || 0,
+      capacity: null, // Treat SDS overall capacity as not-enforced for display
+      domains: event.domains || SDS_DOMAINS,
+      stats
+    });
+  } catch (error) {
+    console.error('Error fetching domain stats:', error.message);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch domain stats',
+      error: error.message
+    });
+  }
+});
+
 // Register for an event
 app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'), validateRegistration, async (req, res) => {
   const registrationStartTime = Date.now();
-  
+  let normalizedSlug = '';
+  let capacityReserved = false;
+
   try {
     await connectDB();
     if (!registrationsCollection || !eventsCollection) {
@@ -600,13 +734,14 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
       college,
       semester,
       branch,
+      domain,
       isIEEEMember,
       membershipGrade,
       membershipNumber,
       paymentDone,
     } = req.body;
 
-    const normalizedSlug = normalizeSlug(eventSlug);
+    normalizedSlug = normalizeSlug(eventSlug);
     const normalizedEmail = String(email || '').trim().toLowerCase();
 
     console.log(`📝 New registration attempt: ${email} for event ${normalizedSlug}`);
@@ -624,20 +759,43 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
       });
     }
 
-    // Check capacity if event has capacity limit
-    if (event.capacity !== null) {
-      const registeredCount = await registrationsCollection.countDocuments({
-        eventSlug: normalizedSlug,
-        status: { $ne: 'cancelled' }
-      });
-      
-      if (registeredCount >= event.capacity) {
-        return res.status(409).json({
-          success: false,
-          message: 'Event is full',
-          error: 'This event has reached its capacity limit',
-          errorCode: 'EVENT_FULL'
-        });
+    // SDS: per-domain capacity is infinite; skip capacity checks and increment counts
+    if (event.track === 'sds') {
+      const domainKey = normalizeDomainKey(domain);
+      await eventsCollection.updateOne(
+        { slug: normalizedSlug },
+        { $inc: { registeredCount: 1, [`domainCounts.${domainKey}`]: 1 } }
+      );
+      capacityReserved = false;
+    } else {
+      // Other events: enforce overall capacity when defined and > 0
+      if (event.capacity !== null && event.capacity > 0) {
+        const reservation = await eventsCollection.findOneAndUpdate(
+          {
+            slug: normalizedSlug,
+            $expr: { $gt: ['$capacity', { $ifNull: ['$registeredCount', 0] }] }
+          },
+          { $inc: { registeredCount: 1 } },
+          { returnDocument: 'after' }
+        );
+
+        if (!reservation || !reservation.value) {
+          return res.status(409).json({
+            success: false,
+            message: 'Event is full',
+            error: 'This event has reached its capacity limit',
+            errorCode: 'EVENT_FULL'
+          });
+        }
+
+        capacityReserved = true;
+      } else {
+        // If capacity is null or 0, just increment the count without checking
+        await eventsCollection.updateOne(
+          { slug: normalizedSlug },
+          { $inc: { registeredCount: 1 } }
+        );
+        capacityReserved = false;
       }
     }
 
@@ -678,33 +836,55 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
     //   }
     // }
 
-    // Upload payment screenshot if provided
+    // Generate registration ID first (needed for async upload callback)
+    const registrationId = generateRegistrationId();
+
+    // Upload payment screenshot if provided (non-blocking for fast response)
     let paymentScreenshotUrl = null;
     let paymentScreenshotDeleteUrl = null;
 
     if (paymentDone && req.file) {
       if (!process.env.IMGBB_API_KEY) {
-        // Skip external upload to avoid long waits when the API key is missing
-        console.warn('⚠️  IMGBB_API_KEY not set; skipping screenshot upload.');
-        paymentScreenshotUrl = '[not uploaded: IMGBB_API_KEY missing]';
-      } else {
+        const errorMsg = '⚠️  IMGBB_API_KEY not set; cannot upload screenshot.';
+        console.warn(errorMsg);
+        return res.status(500).json({
+          success: false,
+          message: 'Payment screenshot upload failed - API key not configured',
+          errorCode: 'IMGBB_CONFIG_ERROR'
+        });
+      }
+
+      try {
         console.log(`📤 Uploading payment screenshot to ImgBB...`);
         const uploadResult = await uploadToImgBB(
           req.file.buffer,
           `payment_${eventSlug}_${Date.now()}`
         );
 
-        if (!uploadResult.success) {
-          throw new Error('Failed to upload payment screenshot');
+        if (!uploadResult || !uploadResult.success) {
+          throw new Error('Upload failed - no success response from ImgBB');
         }
 
         paymentScreenshotUrl = uploadResult.url;
         paymentScreenshotDeleteUrl = uploadResult.deleteUrl;
+        console.log(`✅ Payment screenshot uploaded successfully`);
+      } catch (uploadError) {
+        console.error('❌ ImgBB upload error:', uploadError.message);
+        console.error('Upload error details:', {
+          fileName: req.file.originalname,
+          fileSize: req.file.size,
+          mimeType: req.file.mimetype,
+          error: uploadError.message
+        });
+        
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to upload payment screenshot. Please try again or contact support.',
+          errorCode: 'IMGBB_UPLOAD_ERROR',
+          details: uploadError.message
+        });
       }
     }
-
-    // Generate registration ID
-    const registrationId = generateRegistrationId();
 
     // Prepare registration document
     const registrationDoc = {
@@ -717,6 +897,8 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
       college: college.trim(),
       semester: semester,
       branch: branch.trim(),
+      // SDS-specific fields
+      domain: event.track === 'sds' ? (domain || null) : undefined,
       isIEEEMember: isIEEEMember,
       paymentDone: paymentDone,
       paymentScreenshotUrl: paymentScreenshotUrl,
@@ -725,6 +907,16 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
       createdAt: new Date(),
       updatedAt: new Date(),
     };
+
+    // Fee expectation: SDS members ₹200, non-members ₹400
+    if (event.track === 'sds') {
+      registrationDoc.expectedFee = isIEEEMember ? 200 : 400;
+      registrationDoc.feeCurrency = 'INR';
+      registrationDoc.feeDescription = 'IEEE Members: ₹200 | Non-IEEE Members: ₹400';
+    } else if (typeof event.fee === 'number') {
+      registrationDoc.expectedFee = event.fee;
+      registrationDoc.feeCurrency = 'INR';
+    }
 
     // Attach membership fields only when applicable to avoid null unique collisions
     if (isIEEEMember && normalizedMembershipNumber) {
@@ -755,6 +947,15 @@ app.post('/api/register', registrationLimiter, upload.single('paymentScreenshot'
 
   } catch (error) {
     console.error('❌ Registration error:', error.message);
+
+    // Roll back capacity reservation on failure
+    if (capacityReserved) {
+      try {
+        await eventsCollection.updateOne({ slug: normalizedSlug }, { $inc: { registeredCount: -1 } });
+      } catch (rollbackErr) {
+        console.error('⚠️  Failed to roll back capacity reservation:', rollbackErr.message);
+      }
+    }
     
     // Handle duplicate key errors
     if (error.code === 11000) {

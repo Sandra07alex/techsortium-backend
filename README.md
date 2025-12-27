@@ -357,7 +357,26 @@ The backend will automatically:
 
 ### Seeding Events
 
-You can seed events by inserting documents into the `events` collection:
+Safety-first workflow for seeds and updates:
+
+- Backup current events (recommended before changes):
+```bash
+npm run dump-events
+```
+
+- Safe sync (upsert only, no deletions):
+```bash
+npm run sync-seed
+```
+
+- Force reseed (DESTRUCTIVE: deletes all then inserts):
+```bash
+npm run force-reseed
+```
+
+Add or update events by editing `seed-events.js` (the `events` array). The safe sync will add missing events and update existing ones matched by `slug`, without removing any others.
+
+You can seed events by inserting documents into the `events` collection directly:
 
 ```javascript
 db.events.insertMany([

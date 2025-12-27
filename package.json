@@ -9,6 +9,9 @@
     "dev": "nodemon index.js",
     "start": "node index.js",
     "seed": "node seed-events.js",
+    "sync-seed": "node reseed-events.js",
+    "force-reseed": "node reseed-events.js --force-delete",
+    "dump-events": "node dump-events.js",
     "test-connection": "node test-connection.js"
   },
   "dependencies": {
