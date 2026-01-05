@@ -101,6 +101,20 @@ export const events = [
     requirements: ["Laptop recommended", "LinkedIn profile setup helpful"]
   },
   {
+    id: "w8",
+    title: "HiveMind — Swarm Intelligence Basics",
+    slug: "hivemind-swarm",
+    track: "workshops",
+    shortDescription: "Intro to collective intelligence and swarm-based problem solving.",
+    longDescription: "Explore how simple agents come together to create intelligent systems in this introductory workshop on Swarm Intelligence.\n\nIEEE Techsortium'25, powered by IEEE LINK, presents HiveMind, a session that introduces the principles of collective behavior and decentralized intelligence found in nature and applied in modern computational systems.\n\nThe workshop will be led by Anantha Krishnan K P, Student Representative, IEEE Education Society Kerala Chapter, who will guide participants through core concepts, examples, and applications of swarm-based problem-solving.\n\n🗓 Date: 7 January 2026\n⏰ Time: 8:00 PM\n📍 Venue: Google Meet\n\nThis session is ideal for students and enthusiasts interested in decentralized systems, natural swarms, and how simple interactions can lead to intelligent solutions.",
+    posterUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&auto=format&fit=crop",
+    datetime: "2026-01-07T20:00:00",
+    capacity: null,
+    fee: null,
+    qrPaymentRequired: false,
+    requirements: ["Laptop recommended", "Curiosity about decentralized systems"]
+  },
+  {
     id: "c1",
     title: "Web Development Competition",
     slug: "web-development-competition",
