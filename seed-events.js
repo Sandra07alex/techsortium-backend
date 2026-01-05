@@ -1,47 +1,118 @@
 import { MongoClient } from 'mongodb';
 import 'dotenv/config';
 
-const events = [
+export const events = [
   {
     id: "w1",
-    title: "Full Stack Web Development",
-    slug: "fullstack-web-dev",
+    title: "ThinkUX — UX & Cognitive Science",
+    slug: "thinkux",
     track: "workshops",
-    shortDescription: "Master modern web development with React, Node.js, and MongoDB.",
-    longDescription: "Dive deep into full-stack web development with this comprehensive workshop. Learn to build production-ready applications using React for the frontend, Node.js and Express for the backend, and MongoDB for data persistence. Includes hands-on projects and real-world deployment strategies.",
-    posterUrl: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&auto=format&fit=crop",
-    datetime: "2024-03-15T09:00:00",
-    capacity: 50,
-    fee: 50,
-    qrPaymentRequired: true,
-    requirements: ["Laptop required", "Basic programming knowledge"]
+    shortDescription: "UX & Cognitive Science Workshop",
+    longDescription: "Explore how cognitive science informs user experience design. Speaker: Brian Roy Mathew — UX strategist @ Cenit Labs & Research Activities Coordinator, IEEE EdSoc Kerala Chapter SLT. Event Date: 2025-12-15T20:00:00.",
+    posterUrl: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&auto=format&fit=crop",
+    datetime: "2025-12-15T20:00:00",
+    capacity: null,
+    fee: null,
+    qrPaymentRequired: false,
+    requirements: ["Laptop recommended"]
   },
   {
     id: "w2",
-    title: "Machine Learning Fundamentals",
-    slug: "ml-fundamentals",
+    title: "TejasGuard — Cyber Security Workshop",
+    slug: "tejasguard",
     track: "workshops",
-    shortDescription: "Introduction to ML concepts, algorithms, and practical implementations.",
-    longDescription: "Explore the foundations of machine learning in this beginner-friendly workshop. Understand key algorithms, data preprocessing techniques, and model evaluation metrics. Build your first ML models using Python and scikit-learn.",
-    posterUrl: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=800&auto=format&fit=crop",
-    datetime: "2024-03-16T10:00:00",
-    capacity: 40,
-    fee: 50,
-    qrPaymentRequired: true,
-    requirements: ["Python basics", "Laptop with Python 3.8+"]
+    shortDescription: "Session in Cyber Threats and Defence",
+    longDescription: "Understand contemporary cyber threats and defence strategies. Speaker: Sukesh S — Founder, ASTROLABZ & Project Coordinator, IEEE LINK. Event Date: 2025-12-16T20:00:00.",
+    posterUrl: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&auto=format&fit=crop",
+    datetime: "2025-12-16T20:00:00",
+    capacity: null,
+    fee: null,
+    qrPaymentRequired: false,
+    requirements: ["Laptop recommended"]
   },
   {
     id: "w3",
-    title: "Cloud Computing with AWS",
-    slug: "cloud-aws",
+    title: "Computer Vision 101",
+    slug: "computer-vision-101",
     track: "workshops",
-    shortDescription: "Learn to deploy and manage applications on AWS cloud platform.",
-    longDescription: "Get hands-on experience with Amazon Web Services. Learn about EC2, S3, Lambda, and other essential AWS services. Deploy your first serverless application and understand cloud architecture best practices.",
+    shortDescription: "Beginner-friendly intro to how machines understand visual data.",
+    longDescription: "Step into the world where computers learn to see. Computer Vision 101 introduces the fundamentals of how machines interpret and understand visual data. Led by Deva Nanda Nair, Technical Community Coordinator at IEEE LINK, covering core concepts, real-world applications, and how computer vision powers technologies like facial recognition, medical imaging, and autonomous systems. Event Date: 2025-12-18T20:00:00.",
+    posterUrl: "https://images.unsplash.com/photo-1518779578993-ec3579fee39f?w=800&auto=format&fit=crop",
+    datetime: "2025-12-18T20:00:00",
+    capacity: null,
+    fee: null,
+    qrPaymentRequired: false,
+    requirements: ["Laptop recommended"]
+  },
+  {
+    id: "w4",
+    title: "RAG in AI Systems — Retrieval Augmented Generation",
+    slug: "rag-ai-systems",
+    track: "workshops",
+    shortDescription: "Master Retrieval Augmented Generation (RAG) - how modern AI systems become smarter and more accurate.",
+    longDescription: "Explore how modern AI systems become smarter, more accurate, and context-aware through Retrieval Augmented Generation (RAG) in this end-to-end technical workshop.\n\nIEEE Techsortium'25, powered by IEEE LINK, presents a deep dive into how AI models retrieve real-world knowledge, enhance large language models, and deliver intelligent, reliable responses.\n\nThe session will be led by B Pranavkrishna Vadhyar, AI Consultant at Hashroot and Founder of Core.ai Technical Community, who will walk participants through practical concepts, architectures, and real-world use cases of RAG-based systems.\n\n🗓 Date: 20 December 2025\n⏰ Time: 8:00 PM\n📍 Venue: Google Meet\n\nThis workshop is ideal for students and developers curious about building intelligent AI systems that combine data retrieval with generative models.",
+    posterUrl: "https://images.unsplash.com/photo-1677442d019e157c3c2e8520444b68603b786bbe?w=800&auto=format&fit=crop",
+    datetime: "2025-12-20T20:00:00",
+    capacity: null,
+    fee: null,
+    qrPaymentRequired: false,
+    requirements: ["Laptop recommended", "Basic understanding of AI/ML concepts"]
+  },
+  {
+    id: "w5",
+    title: "CloudOps 101 — Modern Cloud Computing",
+    slug: "cloudops-101",
+    track: "workshops",
+    shortDescription: "Explore the fundamentals of scalable and intelligent cloud computing.",
+    longDescription: "Explore the fundamentals of scalable and intelligent cloud computing in this introductory workshop on modern cloud operations.\n\nIEEE Techsortium'25, powered by IEEE LINK, presents CloudOps 101, a session designed to open the door to cloud platforms, infrastructure management, and operational practices that power today's digital applications.\n\nThe workshop will be led by Abdul Hakkeem P A, MLOps Researcher, who will guide participants through core cloud concepts, real-world use cases, and how cloud systems support scalable and intelligent solutions.\n\n🗓 Date: 22 December 2025\n⏰ Time: 8:00 PM\n📍 Venue: Google Meet\n\nThis session is ideal for students and beginners who are curious about how cloud platforms manage infrastructure at scale and enable modern intelligent systems.",
     posterUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop",
-    datetime: "2024-03-17T09:30:00",
-    capacity: 35,
-    fee: 50,
-    qrPaymentRequired: true
+    datetime: "2025-12-22T20:00:00",
+    capacity: null,
+    fee: null,
+    qrPaymentRequired: false,
+    requirements: ["Laptop recommended", "Basic understanding of cloud concepts helpful"]
+  },
+  {
+    id: "w6",
+    title: "DataPulse — Real-Time Communication with MQTT",
+    slug: "datapulse-mqtt",
+    track: "workshops",
+    shortDescription: "Hands-on MQTT for scalable, real-time IoT communication.",
+    longDescription: "Explore the fundamentals of real-time and intelligent communication in this hands-on workshop focused on MQTT, the lightweight messaging protocol that powers modern IoT and connected systems.\n\nIEEE Techsortium'25, powered by IEEE LINK, presents DataPulse, a practical session that dives into how devices communicate efficiently, how real-time data flows across systems, and how MQTT enables scalable and reliable messaging.\n\nThe workshop will be led by Deva Prakash, YouTuber, Blogger, and Maker in Electronics, and Project Coordinator, IEEE SSCS Kerala Chapter, who will share practical insights, use cases, and demonstrations from real-world IoT applications.\n\n🗓 Date: 23 December 2025\n⏰ Time: 8:00 PM\n📍 Venue: Google Meet\n\nThis session is ideal for students and enthusiasts interested in IoT, embedded systems, and real-time data communication.",
+    posterUrl: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&auto=format&fit=crop",
+    datetime: "2025-12-23T20:00:00",
+    capacity: null,
+    fee: null,
+    qrPaymentRequired: false,
+    requirements: ["Laptop recommended", "Basic understanding of IoT/MQTT helpful"]
+  },
+  {
+    id: "w7",
+    title: "Brand You — Personal Branding on LinkedIn",
+    slug: "brand-you",
+    track: "workshops",
+    shortDescription: "Build your professional identity and strengthen your presence on LinkedIn.",
+    longDescription: "Learn how to build, position, and strengthen your professional identity in the digital world through this focused session on personal branding.\n\nIEEE Techsortium'25, powered by IEEE LINK, presents Brand You, a practical session designed to help you create a strong and authentic presence on LinkedIn. The workshop covers strategies to showcase your skills effectively, communicate your value, and connect with the right professional opportunities.\n\nThe session will be led by Adil A, Technical Coordinator, IEEE SPS Kerala Chapter, who will share actionable insights and best practices for personal branding in today's competitive landscape.\n\n🗓 Date: 27 December 2025\n⏰ Time: 8:00 PM\n📍 Venue: Google Meet\n\nThis session is ideal for students and early professionals looking to build visibility, credibility, and meaningful connections on LinkedIn.",
+    posterUrl: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&auto=format&fit=crop",
+    datetime: "2025-12-27T20:00:00",
+    capacity: null,
+    fee: null,
+    qrPaymentRequired: false,
+    requirements: ["Laptop recommended", "LinkedIn profile setup helpful"]
+  },
+  {
+    id: "w8",
+    title: "HiveMind — Swarm Intelligence Basics",
+    slug: "hivemind-swarm",
+    track: "workshops",
+    shortDescription: "Intro to collective intelligence and swarm-based problem solving.",
+    longDescription: "Explore how simple agents come together to create intelligent systems in this introductory workshop on Swarm Intelligence.\n\nIEEE Techsortium'25, powered by IEEE LINK, presents HiveMind, a session that introduces the principles of collective behavior and decentralized intelligence found in nature and applied in modern computational systems.\n\nThe workshop will be led by Anantha Krishnan K P, Student Representative, IEEE Education Society Kerala Chapter, who will guide participants through core concepts, examples, and applications of swarm-based problem-solving.\n\n🗓 Date: 7 January 2026\n⏰ Time: 8:00 PM\n📍 Venue: Google Meet\n\nThis session is ideal for students and enthusiasts interested in decentralized systems, natural swarms, and how simple interactions can lead to intelligent solutions.",
+    posterUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&auto=format&fit=crop",
+    datetime: "2026-01-07T20:00:00",
+    capacity: null,
+    fee: null,
+    qrPaymentRequired: false,
+    requirements: ["Laptop recommended", "Curiosity about decentralized systems"]
   },
   {
     id: "c1",
@@ -221,22 +292,8 @@ const events = [
     capacity: 70,
     fee: null,
     qrPaymentRequired: false
-  },
-  {
-    id: "h1",
-    title: "TechHack 2024",
-    slug: "techhack-2024",
-    track: "hackathon",
-    shortDescription: "24-hour hackathon to build innovative solutions for real problems.",
-    longDescription: "Join the flagship 24-hour hackathon of IEEE Techsortium! Form teams of up to 4 members and build innovative solutions for real-world challenges. Themes include sustainability, healthcare, education, and fintech. Mentorship available throughout the event.",
-    posterUrl: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&auto=format&fit=crop",
-    datetime: "2024-03-27T08:00:00",
-    capacity: 200,
-    fee: 50,
-    qrPaymentRequired: true,
-    prizes: ["1st: ₹50,000", "2nd: ₹30,000", "3rd: ₹20,000", "Special Categories: ₹10,000 each"],
-    requirements: ["Team of 2-4 members", "Laptop mandatory", "Valid ID proof"]
   }
+  // TechHack 2024 (hackathon track) has been cancelled
 ];
 
 async function seedEvents() {
@@ -280,5 +337,8 @@ async function seedEvents() {
   }
 }
 
+export default events;
+
 seedEvents();
+
 
